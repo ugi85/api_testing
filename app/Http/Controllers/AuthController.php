@@ -148,6 +148,56 @@ class AuthController extends Controller
         ]);
     }
 
+
+    public function logout(Request $request)
+    {
+        $token = $request->bearerToken();
+
+
+        if (!$token) {
+            return response()->json(['message' => 'Token not provided'], 401);
+        }
+
+        if (!$request->user()->tokenCan($token)) {
+            return response()->json(['message' => 'Invalid token'], 401);
+        }
+
+        $request->user()->tokens()->where('id', $request->user()->currentAccessToken()->id)->delete();
+
+        return response()->json(['message' => 'Logged out successfully'], 200);
+    }
+
+
+
+    // public function logout(Request $request)
+    // {
+    //     //valid credential
+    //     $validator = Validator::make($request->only('token'), [
+    //         'token' => 'required'
+    //     ]);
+
+    //     //Send failed response if request is not valid
+    //     if ($validator->fails()) {
+    //         return response()->json(['error' => $validator->messages()], 401);
+    //     }
+
+	// 	//Request is validated, do logout
+    //     try {
+    //         JWTAuth::invalidate($request->token);
+
+    //         return response()->json([
+    //             'status' => '200',
+    //             'success' => true,
+    //             'message' => 'User has been logged out'
+    //         ]);
+    //     } catch (JWTException $exception) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Sorry, user cannot be logged out'
+    //         ], Response::HTTP_INTERNAL_SERVER_ERROR);
+    //     }
+    // }
+
     public function index()
     {
         {
